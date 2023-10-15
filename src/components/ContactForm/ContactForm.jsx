@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+
 import { FormWrapper, Label, Button } from './ContactForm.styled';
 
 export default class ContactForm extends Component {
@@ -8,7 +9,7 @@ export default class ContactForm extends Component {
   };
 
   handleChange = ({ target: { name, value } }) => {
-    this.setState({ [name]: value });
+    this.setState({ [name]: value  });
   };
 
   handleSubmitt = e => {

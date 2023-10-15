@@ -1,38 +1,25 @@
-import { useState, useEffect } from 'react';
-import { nanoid } from 'nanoid';
+import { useSelector, useDispatch } from 'react-redux';
 import Contacts from 'components/Contacts/Contacts';
 import ContactForm from 'components/ContactForm/ContactForm';
 import Filter from 'components/Filter/Filter';
 import { Wrapper } from './App.styled';
+import { addContact, deleteContact } from 'redux/contacts/slice';
+import { addFilter } from 'redux/filter/slice';
+import { nanoid } from 'nanoid';
 
 const App = () => {
-  const [contacts, setContacts] = useState([
-    { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-    { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-    { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-    { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-  ]);
+  const dispatch = useDispatch();
+  const contacts = useSelector(state => state.contacts.contacts);
+  const filter = useSelector(state => state.filter);
 
-  const [filter, setFilter] = useState('');
-
-  useEffect(() => {
-    const localContacts = JSON.parse(localStorage.getItem('contacts'));
-    if (localContacts) {
-      setContacts(localContacts);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
-
-  const addContact = formData => {
+  const addContacts = formData => {
     const { name, number } = formData;
     const newContact = {
+      id: nanoid(),
       name,
       number,
-      id: nanoid(),
     };
+
     if (
       contacts.find(
         contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
@@ -41,36 +28,30 @@ const App = () => {
       return alert(`${newContact.name} is already in contacts.`);
     }
 
-    setContacts([newContact, ...contacts]);
-    // this.setState(({ contacts }) => ({
-    //   contacts: [newContact, ...contacts],
-    // }));
+    dispatch(addContact(newContact));
   };
 
   const filterInput = e => {
-    setFilter(e.currentTarget.value);
+    dispatch(addFilter(e.currentTarget.value));
   };
 
-  const findContact = () => {
+  const сontactList = () => {
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(filter.toLowerCase())
     );
   };
 
   const deleteButton = conId => {
-    // this.setState(prevState => ({
-    //   contacts: prevState.contacts.filter(contact => contact.id !== conId),
-    // }));
-    setContacts(contacts.filter(contact => contact.id !== conId));
+    dispatch(deleteContact(conId));
   };
 
   return (
     <Wrapper>
       <h1>Phonebook</h1>
-      <ContactForm onSubmit={addContact} />
+      <ContactForm onSubmit={addContacts} />
       <h2>Contacts</h2>
-      <Filter findContact={filterInput} />
-      <Contacts contacts={findContact()} deleteButton={deleteButton} />
+      <Filter value={filter} findContact={filterInput} />
+      <Contacts contacts={сontactList()} deleteButton={deleteButton} />
     </Wrapper>
   );
 };
